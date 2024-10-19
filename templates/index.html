@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Posts{% endblock %}
+
+{% block content %}
+    <h1>Posts</h1>
+    {% if user %}
+        <a href="/create_post">Create New Post</a>
+    {% endif %}
+    <div>
+        {% for post in posts %}
+        <div class="post">
+            <h2>{{ post.title }}</h2>
+            <p>{{ post.content[:100] }}...</p>
+            <a href="/post/{{ post.id }}">Read more</a>
+            {% if user %}
+                <a href="/edit_post/{{ post.id }}">Edit</a>
+                <form method="post" action="/delete_post/{{ post.id }}">
+                    <button type="submit">Delete</button>
+                </form>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}
