@@ -1,22 +1,22 @@
 {% extends "base.html" %}
 
-{% block title %}History{% endblock %}
+{% block title %}История{% endblock %}
 
 {% block content %}
-    <h1>Operation History</h1>
-    <a href="/">Back to Home</a>
+    <h1>История операций</h1>
+    <a href="/">Вернуться на стартовую страницу</a>
 
     <!-- Кнопка для очистки истории -->
     <form method="post" action="/history/clear">
-        <button type="submit">Clear History</button>
+        <button type="submit">Очистить историю</button>
     </form>
 
     <div>
         <div class="history-item history-header">
-            <div>Post ID</div>
-            <div>Operation</div>
-            <div>User</div>
-            <div>Timestamp</div>
+            <div>Номер поста</div>
+            <div>Операция</div>
+            <div>Пользователь</div>
+            <div>Время</div>
         </div>
         {% for entry in history %}
         <div class="history-item">

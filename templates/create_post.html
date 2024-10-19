@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Create a New Post{% endblock %}
+{% block title %}Создать новый пост{% endblock %}
 
 {% block content %}
-    <h1>Create a New Post</h1>
+    <h1>Создать новый пост</h1>
     <form method="post" action="/create_post">
-        <label for="title">Title</label>
+        <label for="title">Заголовок</label>
         <input type="text" name="title" id="title" required>
-        <label for="content">Content</label>
+        <label for="content">Содержание</label>
         <textarea name="content" id="content" required></textarea>
-        <button type="submit">Create</button>
+        <button type="submit">Создать</button>
     </form>
-    <a href="/">Back to Home</a>
+    <a href="/">Вернуться на стартовую страницу</a>
 {% endblock %}
