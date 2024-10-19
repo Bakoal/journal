@@ -5,15 +5,16 @@ from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 import hashlib
+import sqlalchemy
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['*'],
+    allow_origins=['http://localhost:8000'],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type","Set-Cookie"],
 )
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -174,7 +175,7 @@ def log_operation(post_id, operation, user):
 def get_history():
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-    cursor.execute("SELECT post_id, operation, user, timestamp FROM history ORDER BY timestamp DESC")
+    cursor.execute("SELECT post_id, operation, user_id, timestamp FROM history ORDER BY timestamp DESC")
     history = cursor.fetchall()
     conn.close()
     return [{"post_id": row[0], "operation": row[1], "user": row[2], "timestamp": row[3]} for row in history]
