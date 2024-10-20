@@ -4,12 +4,12 @@
 
 {% block content %}
     <h1>История операций</h1>
-    <a href="/">Вернуться на стартовую страницу</a>
 
-    <!-- Кнопка для очистки истории -->
-    <form method="post" action="/history/clear">
-        <button type="submit">Очистить историю</button>
-    </form>
+    <div class="clear-history-container"></div>
+        <form method="post" action="/history/clear">
+            <button type="submit" class="clear-history-button">Очистить историю</button>
+        </form>
+    </div>
 
     <div>
         <div class="history-item history-header">
@@ -22,7 +22,7 @@
         <div class="history-item">
             <div>{{ entry.post_id }}</div>
             <div>{{ entry.operation }}</div>
-            <div>{{ entry.user }}</div>
+            <div>{{ entry.username }}</div>
             <div>{{ entry.timestamp }}</div>
         </div>
         {% endfor %}

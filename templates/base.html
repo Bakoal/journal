@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Посты{% endblock %}</title>
+    <title>{% block title %}Записи{% endblock %}</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <!-- Шапка с навигацией -->
     <header>
         <nav>
-            <a href="/">Стартовая страница</a>
-            {% if user %}
-                <a href="/auth/logout">Выйти ({{ user }})</a>
+            <a href="/">Записи</a>
+            {% if username %}
+                <a href="/auth/logout">Выйти ({{ username }})</a>
             {% else %}
                 <a href="/auth/login">Войти</a>
                 <a href="/auth/register">Зарегистрироваться</a>
