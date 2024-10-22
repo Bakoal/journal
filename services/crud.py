@@ -53,16 +53,16 @@ def clear_history():
 def verify_user(user_data: UserLogin, db: Session):
     user = db.query(User).filter(User.username == user_data.username).first()
     if user is None:
-        return None, "Неверная электронная почта или пароль"
+        return None, "Неверное имя пользователя или пароль"
     hashed_password = hash_password(user_data.password)
     if user.password != hashed_password:
-        return None, "Неверная электронная почта или пароль" 
+        return None, "Неверное имя пользователя или пароль" 
     return user, None
 
 def create_user(user_data: UserCreate, db: Session):
     user_exists = db.query(User).filter((User.email == user_data.email) | (User.username == user_data.username)).first()
     if user_exists:
-        raise HTTPException(status_code=400, detail="Пользователь с таким email или именем уже существует")
+        raise HTTPException(status_code=400, detail="Пользователь с такой электронное почтой или именем уже существует")
     hashed_password = hash_password(user_data.password)
     new_user = User(email=user_data.email, username=user_data.username, password=hashed_password)
     db.add(new_user)
