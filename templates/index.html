@@ -5,7 +5,7 @@
 {% block content %}
     <h1>Записи</h1>
     {% if error %}
-        <div class="error-message" style="color: red;">
+        <div class="error-message">
             <p>{{ error }}</p>
         </div>
     {% endif %}
@@ -20,10 +20,13 @@
             <a href="/post/{{ post.id }}">Читать далее</a>
             {% if username %}
                 <a href="/edit_post/{{ post.id }}">Редактировать</a>
-                <form method="post" action="/delete_post/{{ post.id }}">
+                <form method="post" action="/delete_post/{{ post.id }}"  style="display: inline;">
                     <button type="submit">Удалить</button>
                 </form>
             {% endif %}
+            <div class="post-author">
+                Автор: {{ post.username }}
+            </div>
         </div>
         {% endfor %}
     </div>

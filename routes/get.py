@@ -34,7 +34,7 @@ async def read_post(request: Request, post_id: int, db: Session = Depends(get_db
     username = get_current_user(request)
     post = get_post(post_id, db)
     if not post:
-        raise HTTPException(status_code=404, detail="Post not found")
+        raise HTTPException(status_code=404, detail="Пост не найден")
     return templates.TemplateResponse("post.html", {"request": request, "username": username, "post": post})
 
 @get_router.get("/create_post", response_class=HTMLResponse)
@@ -47,7 +47,7 @@ async def edit_post(request: Request, post_id: int, db: Session = Depends(get_db
     username = get_current_user(request)
     post = get_post(post_id, db)
     if not post:
-        raise HTTPException(status_code=404, detail="Post not found")
+        raise HTTPException(status_code=404, detail="Пост не найден")
     return templates.TemplateResponse("edit_post.html", {"request": request, "username": username, "post": post})
 
 @get_router.get("/history", response_class=HTMLResponse)

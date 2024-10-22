@@ -4,6 +4,9 @@
 
 {% block content %}
     <h1>Редактировать пост</h1>
+    <div class="more-details">
+        Автор: {{ post.username }}
+    </div>
     <form method="post" action="/edit_post/{{ post.id }}">
         <div>
             <label for="title">Заголовок:</label>

@@ -23,9 +23,8 @@ class Post(Base):
 class History(Base):
     __tablename__ = 'history'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    post_id = Column(Integer, ForeignKey('posts.id'), nullable=True)
+    post_title = Column(String, nullable=False)
     operation = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
-    post = relationship("Post")
     user = relationship("User")

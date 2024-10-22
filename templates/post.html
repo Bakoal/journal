@@ -4,6 +4,9 @@
 
 {% block content %}
     <h1>{{ post.title }}</h1>
+    <div class="more-details">
+        Автор: {{ post.username }}
+    </div>
     <p>{{ post.content }}</p>
     <a href="/">Вернуться на стартовую страницу</a>
 {% endblock %}

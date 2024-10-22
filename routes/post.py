@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Form, HTTPException, Response, Depends
+from fastapi import APIRouter, Request, Form, HTTPException, Depends
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from services.schemas import UserCreate, UserLogin
@@ -36,12 +36,6 @@ async def update_post(request: Request, post_id: int, title: str = Form(...), co
     username = get_current_user(request)
     update_blog_post(post_id, title, content, username, db)
     return RedirectResponse(url=f"/post/{post_id}", status_code=303)
-
-@post_router.post("/edit_post/{post_id}")
-async def edit_post(request: Request, post_id: int, title: str = Form(...), content: str = Form(...), db: Session = Depends(get_db)):
-    username = get_current_user(request)
-    update_blog_post(post_id, title, content, username)
-    return RedirectResponse("/", status_code=303)
 
 @post_router.post("/delete_post/{post_id}")
 async def delete_post(request: Request, post_id: int, db: Session = Depends(get_db)):

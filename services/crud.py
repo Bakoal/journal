@@ -1,26 +1,21 @@
 from db.models import User, Post, History
 from db.init import SessionLocal
-from fastapi import HTTPException, Response, status
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from services.schemas import UserCreate, UserLogin
 import hashlib
-from datetime import timedelta
+from datetime import datetime
 
 
 # Функция для хэширования паролей
 def hash_password(password: str):
     return hashlib.sha256(password.encode()).hexdigest()
 
-def set_cookie(response: Response, key: str, value: str, max_age: int = 3600):
-    response.set_cookie(
-        key=key, 
-        value=value, 
-        httponly=True, 
-        max_age=max_age, 
-        secure=False, # True для HTTPS, False для HTTP (во время разработки)
-        samesite='none' # 'lax' или 'strict' для большей безопасности, 'none' для использования на нескольких доменах
-    )
-    return True
+def get_current_user(request):
+    username = request.cookies.get("username")
+    if not username:
+        return None
+    return username
 
 # Функции для работы с базой данных
 
@@ -32,6 +27,29 @@ def get_db():
     finally:
         db.close()
 
+def log_operation(db: Session, post_title: str, operation: str, user_id: int):
+    new_history = History(post_title=post_title, operation=operation, user_id=user_id, timestamp=datetime.now())
+    db.add(new_history)
+    db.commit()
+
+def get_history(db: Session):
+    history = db.query(History).order_by(History.timestamp.desc()).all()
+    result = []
+    for h in history:
+        result.append({
+            "post_title": h.post_title,
+            "operation": h.operation,
+            "username": h.user.username,
+            "timestamp": h.timestamp.strftime("%H:%M:%S %d/%m/%Y")
+        })
+    return result
+
+def clear_history():
+    session = SessionLocal()
+    session.query(History).delete()
+    session.commit()
+    session.close()
+
 def verify_user(user_data: UserLogin, db: Session):
     user = db.query(User).filter(User.username == user_data.username).first()
     if user is None:
@@ -41,32 +59,25 @@ def verify_user(user_data: UserLogin, db: Session):
         return None, "Неверная электронная почта или пароль" 
     return user, None
 
-def get_current_user(request):
-    username = request.cookies.get("username")
-    if not username:
-        return None
-    return username
-
 def create_user(user_data: UserCreate, db: Session):
     user_exists = db.query(User).filter((User.email == user_data.email) | (User.username == user_data.username)).first()
     if user_exists:
-        raise HTTPException(status_code=400, detail="Пользователь с таким email или username уже существует")
+        raise HTTPException(status_code=400, detail="Пользователь с таким email или именем уже существует")
     hashed_password = hash_password(user_data.password)
     new_user = User(email=user_data.email, username=user_data.username, password=hashed_password)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    #log_operation(session=db, post_id=None, operation="register", user_id=new_user.id)
     return new_user
 
 def get_posts(db: Session):
     posts = db.query(Post).all()
-    return [{"id": post.id, "title": post.title, "content": post.content, "user_id": post.user_id} for post in posts]
+    return [{"id": post.id, "title": post.title, "content": post.content, "username": post.user.username} for post in posts]
 
 def get_post(post_id: int, db: Session):
     post = db.query(Post).filter_by(id=post_id).first()
     if post:
-        return {"id": post.id, "title": post.title, "content": post.content, "user_id": post.user_id}
+        return {"id": post.id, "title": post.title, "content": post.content, "username": post.user.username if post.user else "Неизвестно"}
     return None
 
 def create_new_post(title: str, content: str, username: str, db: Session):
@@ -74,7 +85,7 @@ def create_new_post(title: str, content: str, username: str, db: Session):
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
+            detail="Пользователь не найден"
         )
     new_post = Post(
         title=title,
@@ -84,7 +95,7 @@ def create_new_post(title: str, content: str, username: str, db: Session):
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
-    log_operation(db, new_post.id, "create", user.id)
+    log_operation(db, new_post.title, "create", user.id)
     return new_post
 
 def update_blog_post(post_id: int, title: str, content: str, username: str, db: Session):
@@ -92,51 +103,20 @@ def update_blog_post(post_id: int, title: str, content: str, username: str, db: 
     if not post:
         raise HTTPException(status_code=404, detail="Пост не найден")
     if post.user.username != username:
-        raise HTTPException(status_code=403, detail="У вас нет разрешения на удаление этого поста")
+        raise HTTPException(status_code=403, detail="У вас нет разрешения на изменение этого поста")
     post.title = title
     post.content = content
     db.commit()
     db.refresh(post)
+    log_operation(db, post.title, "edit", post.user_id)
     return post
 
 def delete_blog_post(post_id: int, username: str, db: Session):
-    #user = db.query(User).filter_by(username=username).first()
     post = db.query(Post).filter(Post.id == post_id).first()
     if not post:
         raise HTTPException(status_code=404, detail="Пост не найден")
     if post.user.username != username:
         raise HTTPException(status_code=403, detail="У вас нет разрешения на удаление этого поста")
-    #if user:
-    #    db.query(Post).filter_by(id=post_id, user_id=user.id).delete()
-    #    log_operation(db, post_id, "delete", user.id)
     db.delete(post)
     db.commit()
-
-def log_operation(session, post_id: int, operation: str, user_id: int):
-    new_history = History(post_id=post_id, operation=operation, user_id=user_id)
-    session.add(new_history)
-    session.commit()
-
-def get_history(db):
-    history = db.query(History).order_by(History.timestamp.desc()).all()
-    result = []
-    for h in history:
-        timestamp_utc = h.timestamp
-        timestamp_moscow = timestamp_utc + timedelta(hours=3)
-        if h.post:
-            post_title = h.post.title
-        else:
-            post_title = "Название удалённого поста скрыто"
-        result.append({
-            "post_title": post_title,
-            "operation": h.operation,
-            "username": h.user.username,
-            "timestamp": timestamp_moscow.strftime("%H:%M:%S %d/%m/%Y")
-        })
-    return result
-
-def clear_history():
-    session = SessionLocal()
-    session.query(History).delete()
-    session.commit()
-    session.close()
+    log_operation(db, post.title, "delete", post.user_id)
