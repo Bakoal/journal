@@ -12,8 +12,10 @@ templates = Jinja2Templates(directory="templates")
 
 
 @post_router.post("/auth/register")
-def register_user(user_data: UserCreate = Form(...), db: Session = Depends(get_db)):
-    new_user = create_user(user_data, db)
+def register_user(request: Request, user_data: UserCreate = Form(...), db: Session = Depends(get_db)):
+    error_message = create_user(user_data, db)
+    if error_message:
+        return templates.TemplateResponse("register.html", {"request": request, "error_message": error_message})
     return RedirectResponse("/auth/login", status_code=303)
 
 @post_router.post("/auth/login")
@@ -34,7 +36,10 @@ async def create_post(request: Request, title: str = Form(...), content: str = F
 @post_router.post("/edit_post/{post_id}")
 async def update_post(request: Request, post_id: int, title: str = Form(...), content: str = Form(...), db: Session = Depends(get_db)):
     username = get_current_user(request)
-    update_blog_post(post_id, title, content, username, db)
+    posts = get_posts(db)
+    error_message = update_blog_post(post_id, title, content, username, db)
+    if error_message:
+        return templates.TemplateResponse("index.html", {"request": request, "username": username, "posts": posts, "error": error_message})
     return RedirectResponse(url=f"/post/{post_id}", status_code=303)
 
 @post_router.post("/delete_post/{post_id}")

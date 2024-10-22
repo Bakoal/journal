@@ -4,6 +4,11 @@
 
 {% block content %}
     <h1>Регистрация</h1>
+    {% if error_message %}
+        <div style="color: red;">
+            <p>{{ error_message }}</p>
+        </div>
+    {% endif %}
     <form method="post" action="/auth/register">
         <div>
             <label for="email">Электронная почта:</label>

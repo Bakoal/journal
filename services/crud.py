@@ -62,13 +62,13 @@ def verify_user(user_data: UserLogin, db: Session):
 def create_user(user_data: UserCreate, db: Session):
     user_exists = db.query(User).filter((User.email == user_data.email) | (User.username == user_data.username)).first()
     if user_exists:
-        raise HTTPException(status_code=400, detail="Пользователь с такой электронное почтой или именем уже существует")
+        return "Пользователь с такой электронной почтой или именем уже существует"
     hashed_password = hash_password(user_data.password)
     new_user = User(email=user_data.email, username=user_data.username, password=hashed_password)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return new_user
+    return None
 
 def get_posts(db: Session):
     posts = db.query(Post).all()
@@ -101,15 +101,17 @@ def create_new_post(title: str, content: str, username: str, db: Session):
 def update_blog_post(post_id: int, title: str, content: str, username: str, db: Session):
     post = db.query(Post).filter(Post.id == post_id).first()
     if not post:
-        raise HTTPException(status_code=404, detail="Пост не найден")
+        return "Пост не найден"
+        # raise HTTPException(status_code=404, detail="Пост не найден")
     if post.user.username != username:
-        raise HTTPException(status_code=403, detail="У вас нет разрешения на изменение этого поста")
+        return "У вас нет разрешения на изменение этого поста"
+        # raise HTTPException(status_code=403, detail="У вас нет разрешения на изменение этого поста")
     post.title = title
     post.content = content
     db.commit()
     db.refresh(post)
     log_operation(db, post.title, "edit", post.user_id)
-    return post
+    return None
 
 def delete_blog_post(post_id: int, username: str, db: Session):
     post = db.query(Post).filter(Post.id == post_id).first()
