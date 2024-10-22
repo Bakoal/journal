@@ -1,4 +1,6 @@
-from pydantic import BaseModel, EmailStr, constr
+from pydantic import BaseModel, EmailStr
+
+
 # Модель для регистрации пользователя
 class UserCreate(BaseModel):
     email: EmailStr

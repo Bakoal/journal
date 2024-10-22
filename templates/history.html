@@ -11,16 +11,16 @@
         </form>
     </div>
 
-    <div>
-        <div class="history-item history-header">
-            <div>Номер поста</div>
+    <div class="history-table">
+        <div class="history-header">
+            <div>Название поста</div>
             <div>Операция</div>
             <div>Пользователь</div>
             <div>Время</div>
         </div>
         {% for entry in history %}
-        <div class="history-item">
-            <div>{{ entry.post_id }}</div>
+        <div class="history-row">
+            <div>{{ entry.post_title }}</div>
             <div>{{ entry.operation }}</div>
             <div>{{ entry.username }}</div>
             <div>{{ entry.timestamp }}</div>

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Редактировать пост{% endblock %}
+
+{% block content %}
+    <h1>Редактировать пост</h1>
+    <form method="post" action="/edit_post/{{ post.id }}">
+        <div>
+            <label for="title">Заголовок:</label>
+            <input type="text" id="title" name="title" value="{{ post.title }}" required minlength="3">
+        </div>
+        <div>
+            <label for="content">Содержание:</label>
+            <textarea id="content" name="content" required>{{ post.content }}</textarea>
+        </div>
+        <div>
+            <button type="submit">Сохранить изменения</button>
+        </div>
+    </form>
+    <a href="/post/{{ post.id }}">Отменить</a>
+{% endblock %}

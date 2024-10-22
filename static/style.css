@@ -49,8 +49,6 @@ footer {
     width: 100%;
 }
 
-
-
 body {
     font-family: Arial, sans-serif;
     padding: 20px;
@@ -93,10 +91,6 @@ input, textarea {
     margin-bottom: 10px;
 }
 
-
-
-
-
 .clear-history-container {
     display: flex;
     justify-content: flex-end; /* Перемещаем кнопку вправо */
@@ -116,10 +110,18 @@ input, textarea {
     background-color: #ff3333;
 }
 
-.history-item {
-    display: flex;
-    justify-content: space-between; /* Распределение элементов внутри строки */
-    /*margin-bottom: 10px;*/
+/* Сетка для истории */
+.history-table {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 2fr; /* Четыре колонки с разным соотношением ширины */
+    gap: 10px; /* Пробелы между колонками */
+}
+
+.history-header, .history-row {
+    display: contents; /* Используем display: contents для выравнивания элементов в сетке */
+}
+
+.history-header > div, .history-row > div {
     padding: 10px;
     border-bottom: 1px solid #ddd;
 }
@@ -127,4 +129,8 @@ input, textarea {
 .history-header {
     font-weight: bold;
     background-color: #f1f1f1;
+}
+
+.history-row:nth-child(even) {
+    background-color: #f9f9f9;
 }

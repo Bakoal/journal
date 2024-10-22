@@ -7,7 +7,6 @@
 ORM: SQLAlchemy
 Архитектура: MVC
 Язык программирования: Python 3.10
-Формат ответов: API JSON
 Фреймворк: FastAPI
 API предоставляет серверные методы для реализации этого сценария
 
@@ -19,4 +18,4 @@ API предоставляет серверные методы для реали
 
 pip install -r requirements.txt
 
-uvicorn main:app --host 0.0.0.0 --port 80
+uvicorn main:app --host 0.0.0.0 --port 8000

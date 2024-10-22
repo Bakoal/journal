@@ -4,6 +4,11 @@
 
 {% block content %}
     <h1>Записи</h1>
+    {% if error %}
+        <div class="error-message" style="color: red;">
+            <p>{{ error }}</p>
+        </div>
+    {% endif %}
     {% if username %}
         <a href="/create_post">Создать новый пост</a>
     {% endif %}

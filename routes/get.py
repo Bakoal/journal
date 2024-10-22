@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Request, HTTPException, Response
+from fastapi import APIRouter, Request, HTTPException, Response, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from services.crud import get_post, get_posts, get_current_user, get_history
+from services.crud import get_post, get_posts, get_current_user, get_history, get_db
+from sqlalchemy.orm import Session
 
 
 get_router = APIRouter()
@@ -9,9 +10,9 @@ get_router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 @get_router.get("/", response_class=HTMLResponse)
-async def home(request: Request):
+async def home(request: Request, db: Session = Depends(get_db)):
     username = get_current_user(request)
-    posts = get_posts()
+    posts = get_posts(db)
     return templates.TemplateResponse("index.html", {"request": request, "username": username, "posts": posts})
 
 @get_router.get("/auth/register", response_class=HTMLResponse)
@@ -24,16 +25,17 @@ async def login_page(request: Request):
 
 @get_router.get("/auth/logout")
 async def logout(response: Response):
-    response.delete_cookie("user_id")
-    return RedirectResponse("/auth/login", status_code=303)
+    response = RedirectResponse(url="/auth/login", status_code=303)
+    response.delete_cookie(key="username")
+    return response
 
 @get_router.get("/post/{post_id}", response_class=HTMLResponse)
-async def read_post(request: Request, post_id: int):
-    post = get_post(post_id)
+async def read_post(request: Request, post_id: int, db: Session = Depends(get_db)):
+    username = get_current_user(request)
+    post = get_post(post_id, db)
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
-    username = get_current_user(request)
-    return templates.TemplateResponse("post.html", {"request": request, "post": post, "username": username})
+    return templates.TemplateResponse("post.html", {"request": request, "username": username, "post": post})
 
 @get_router.get("/create_post", response_class=HTMLResponse)
 async def create_post_form(request: Request):
@@ -41,14 +43,15 @@ async def create_post_form(request: Request):
     return templates.TemplateResponse("create_post.html", {"request": request, "username": username})
 
 @get_router.get("/edit_post/{post_id}", response_class=HTMLResponse)
-async def edit_post_form(request: Request, post_id: int):
+async def edit_post(request: Request, post_id: int, db: Session = Depends(get_db)):
     username = get_current_user(request)
-    post = get_post(post_id)
+    post = get_post(post_id, db)
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
     return templates.TemplateResponse("edit_post.html", {"request": request, "username": username, "post": post})
 
 @get_router.get("/history", response_class=HTMLResponse)
-async def history(request: Request):
-    history = get_history()
-    return templates.TemplateResponse("history.html", {"request": request, "history": history})
+async def history(request: Request, db: Session = Depends(get_db)):
+    username = get_current_user(request)
+    history = get_history(db)
+    return templates.TemplateResponse("history.html", {"request": request, "username": username, "history": history})
