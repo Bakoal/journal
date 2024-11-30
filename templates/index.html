@@ -15,8 +15,8 @@
     <div>
         {% for post in posts %}
         <div class="post">
-            <h2>{{ post.title }}</h2>
-            <p>{{ post.content[:100] }}...</p>
+            <h2>{{ post.title[:150] }}</h2>
+            <p>{{ post.content[:200] }}...</p>
             <a href="/post/{{ post.id }}">Читать далее</a>
             {% if username %}
                 <a href="/edit_post/{{ post.id }}">Редактировать</a>

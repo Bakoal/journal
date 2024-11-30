@@ -3,10 +3,10 @@
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
-    <h1>{{ post.title }}</h1>
+    <h1 class="post-title">{{ post.title }}</h1>
     <div class="more-details">
         Автор: {{ post.username }}
     </div>
-    <p>{{ post.content }}</p>
+    <p class="post-content">{{ post.content }}</p>
     <a href="/">Вернуться на стартовую страницу</a>
 {% endblock %}
