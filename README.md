@@ -19,11 +19,13 @@
 
 ### **Примечание**
 
-Зависимости указаны в файле *requirements.txt*
-
 Добавив маршрут */docs* или */redoc* можно получить документацию по API приложения
 
-### **Запуск приложения**
+### **Тестовый сервер запущен**
+
+http://89.111.142.22/
+
+### **Запуск приложения без Docker**
 
 ```bash
 pip install -r requirements.txt
@@ -31,6 +33,12 @@ pip install -r requirements.txt
 
 ```bash
 uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+### **Запуск приложения через Docker**
+
+```bash
+docker-compose up --build -d
 ```
 
 ### **Скриншоты**
